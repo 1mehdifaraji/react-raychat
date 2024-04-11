@@ -1,3 +1,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: "iranyekan";
+  src: url("./fonts/IRANYekanX-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "iranyekan";
+  src: url("./fonts/IRANYekanX-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+@layer base {
+  ::selection {
+    @apply bg-primary;
+    @apply text-white;
+  }
+  html {
+    font-family: "iranyekan";
+    @apply font-medium;
+  }
+}
+
+.rtl {
+  direction: rtl !important;
+}
