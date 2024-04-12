@@ -113,7 +113,6 @@ export const useRaychat = ({ url, id }: UseRaychatProps) => {
     removeRaychatElements,
     currentRaychatUserId,
     loadCustomUserMessages,
-    getUserPrevMessages,
     restartRaychat,
     raychatReady,
     isTokenAvailable,
