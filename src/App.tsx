@@ -2,14 +2,7 @@ import { FC, useEffect } from "react";
 import { useRaychat } from "./lib";
 
 const App: FC = () => {
-  const {
-    addRaychatScript,
-    toggleWidget,
-    removeRaychat,
-    restartRaychat,
-    raychatReady,
-    isEnabled,
-  } = useRaychat({
+  const { addRaychatScript } = useRaychat({
     id: "raychat",
     url: "https://widget-react.raychat.io/install/widget.js",
   });

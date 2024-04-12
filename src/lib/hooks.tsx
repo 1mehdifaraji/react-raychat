@@ -3,17 +3,21 @@ import { useEffect, useState } from "react";
 import {
   getElemById,
   getFromLocalStorage,
+  getAllTags,
   raychat,
   removeElem,
   saveToLocalStorage,
 } from "./helper";
 
 export const useRaychat = ({ url, id }: UseRaychatProps) => {
-  const [isEnabled] = useState(process.env.REACT_APP_RAYCHAT_TOKEN);
-  const [raychatReady, setRaychatReady] = useState(false);
+  const [isTokenAvailable] = useState<string | undefined>(
+    process.env.REACT_APP_RAYCHAT_TOKEN
+  );
+  const [raychatReady, setRaychatReady] = useState<boolean>(false);
+  const [currentRaychatUserId, setCurrentRaychatUserId] = useState<string>("");
 
   const addRaychatScript = (): void => {
-    if (isEnabled) {
+    if (isTokenAvailable) {
       window.RAYCHAT_TOKEN = process.env.REACT_APP_RAYCHAT_TOKEN as string;
       const script = document.createElement("script");
 
@@ -23,6 +27,8 @@ export const useRaychat = ({ url, id }: UseRaychatProps) => {
       script.type = "text/javascript";
 
       document.head.appendChild(script);
+    } else {
+      window.alert("توکن یافت نشد.");
     }
   };
 
@@ -38,34 +44,50 @@ export const useRaychat = ({ url, id }: UseRaychatProps) => {
     restartRaychat();
   };
 
-  const removeRaychat = (): void => {
-    const raychatScript = getElemById("raychat");
-    const raychatWidget = getElemById("raychat_widget");
-    const raychatWidgetStyles = getElemById("raychat_frame_styles");
-    if (raychatScript) removeElem(raychatScript);
-    if (raychatWidget) removeElem(raychatWidget);
-    if (raychatWidgetStyles) removeElem(raychatWidgetStyles);
+  const removeAllRaychatScripts = ({ id }: { id: string }) => {
+    if (
+      id &&
+      (id === "raychat" ||
+        id === "raychat_widget" ||
+        id === "raychat_frame_styles")
+    ) {
+      const raychatElement = getElemById(id);
+      if (raychatElement) removeElem(raychatElement);
+    }
+  };
+
+  const removeRaychatElements = (): void => {
+    setRaychatReady(false);
+    getAllTags("script", removeAllRaychatScripts);
+    getAllTags("iframe", removeAllRaychatScripts);
+    getAllTags("style", removeAllRaychatScripts);
   };
 
   const restartRaychat = (): void => {
     setRaychatReady(false);
-    removeRaychat();
+    removeRaychatElements();
     addRaychatScript();
   };
 
   const saveRaychatUserId = (userId: string): void =>
     saveToLocalStorage("raychat_user_id", userId);
 
+  const loadCustomUserMessages = (id: string) => {
+    saveToLocalStorage("raychat_user_id", id);
+    getUserPrevMessages(id);
+  };
+
   const initRaychatUser = (): void => {
-    const currentRaychatUser = window.Raychat.getUser();
+    const currentRaychatUser = raychat().getUser();
+    setCurrentRaychatUserId(currentRaychatUser.id);
     const savedRaychatId = getFromLocalStorage("raychat_user_id");
     if (
       currentRaychatUser &&
       savedRaychatId &&
       savedRaychatId !== currentRaychatUser.id
-    )
+    ) {
       getUserPrevMessages(savedRaychatId);
-    else {
+    } else {
       saveRaychatUserId(currentRaychatUser.id);
       animateRaychatWidget("tada");
       setRaychatReady(true);
@@ -79,18 +101,21 @@ export const useRaychat = ({ url, id }: UseRaychatProps) => {
     window.removeEventListener("raychat_ready", initRaychatUser);
 
   useEffect(() => {
-    if (isEnabled) addRaychatEventListener();
+    if (isTokenAvailable) addRaychatEventListener();
     return () => {
-      if (isEnabled) removeRaychatEventListener();
+      if (isTokenAvailable) removeRaychatEventListener();
     };
   });
 
   return {
     addRaychatScript,
     toggleWidget,
-    removeRaychat,
+    removeRaychatElements,
+    currentRaychatUserId,
+    loadCustomUserMessages,
+    getUserPrevMessages,
     restartRaychat,
     raychatReady,
-    isEnabled,
+    isTokenAvailable,
   };
 };
