@@ -61,7 +61,7 @@ const App: FC = () => {
             های رایچت که خیلی کاربردی هستن در کاستوم هوک، قرار دادم. برای
             توضیحات بیشتر خودم، میتونی به
             <Link
-              url="https://raychat.io/documentation#client_api"
+              url="https://www.linkedin.com/posts/mehdifaraji_react-reactjs-next-activity-7184444037922230273-3H7v?utm_source=share&utm_medium=member_desktop"
               title="پست لینکدین"
             />
             من سر بزنی و نظرتو بگی.
